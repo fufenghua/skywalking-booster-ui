@@ -27,6 +27,8 @@ import * as alarm from "./query/alarm";
 import * as event from "./query/event";
 import * as ebpf from "./query/ebpf";
 import * as demandLog from "./query/demand-log";
+import router from "@/router";
+import Axios from "axios";
 
 const query: { [key: string]: string } = {
   ...app,
@@ -41,6 +43,19 @@ const query: { [key: string]: string } = {
   ...ebpf,
   ...demandLog,
 };
+
+Axios.interceptors.request.use(
+  (config) => {
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    config.headers["Authorization"] = sessionStorage.getItem("token");
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
+  }
+);
+
 class Graphql {
   private queryData = "";
   public query(queryData: string) {
@@ -55,7 +70,9 @@ class Graphql {
           query: query[this.queryData],
           variables: variablesData,
         },
-        { cancelToken: cancelToken() }
+        {
+          cancelToken: cancelToken(),
+        }
       )
       .then((res: AxiosResponse) => {
         if (res.data.errors) {
@@ -65,7 +82,11 @@ class Graphql {
         }
         return res;
       })
-      .catch((err: Error) => {
+      .catch((err) => {
+        if (err.response.status === 401) {
+          router.push(`/login`);
+          return err;
+        }
         throw err;
       });
   }

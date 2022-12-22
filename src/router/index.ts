@@ -19,12 +19,26 @@ import { routesDashboard } from "./dashboard";
 import { routesSetting } from "./setting";
 import { routesAlarm } from "./alarm";
 import routesLayers from "./layer";
-
+import Login from "../views/Login/index.vue";
 const routes: Array<RouteRecordRaw> = [
   ...routesLayers,
   ...routesDashboard,
   ...routesAlarm,
   ...routesSetting,
+  ...[
+    {
+      path: "/login",
+      name: "login",
+      side: true,
+      meta: {
+        title: "login",
+        icon: "settings",
+        hasGroup: false,
+      },
+      component: Login,
+      children: [],
+    },
+  ],
 ];
 
 const router = createRouter({

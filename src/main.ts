@@ -32,6 +32,8 @@ app.use(store);
 mountApp();
 
 async function mountApp() {
-  await appStore.queryOAPTimeInfo();
+  if (location.pathname !== "/login" && sessionStorage.getItem("token")) {
+    await appStore.queryOAPTimeInfo();
+  }
   app.use(router).mount("#app");
 }
